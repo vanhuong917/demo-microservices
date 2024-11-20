@@ -23,7 +23,8 @@ builder.Services.AddMassTransit(conf =>
         cfg.Host(builder.Configuration["EventBusSettings:HostAddress"]!);
         cfg.ReceiveEndpoint(EventBusConstants.AccountTransactionQueue, c =>
         {
-            c.ConfigureConsumer<AccountTransactionConsumer>(ctx);
+           c.ConfigureConsumer<AccountTransactionConsumer>(ctx);
+           c.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5))); // Retry 3 lần, mỗi lần cách nhau 5 giây
         });
     });
 });

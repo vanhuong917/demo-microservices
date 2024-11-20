@@ -20,9 +20,20 @@ namespace Transaction.API.EventBusConsumer
 
         public async Task Consume(ConsumeContext<AccountTransactionEvent> context)
         {
-            var transaction = _mapper.Map<Entities.Transaction>(context.Message);
-            if (transaction is not null)
-                await _transactionRepository.Add(transaction);
+            try
+            {
+                var transaction = _mapper.Map<Entities.Transaction>(context.Message);
+                if (transaction is not null)
+                {
+                    await _transactionRepository.Add(transaction);
+                    await context.ConsumeCompleted; // Gửi xác nhận về RabbitMQ
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing message");
+                // Không gửi xác nhận, RabbitMQ sẽ gửi lại thông điệp
+            }
         }
     }
 }

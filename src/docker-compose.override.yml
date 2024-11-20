@@ -22,7 +22,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - accountdb_data:/var/lib/postgresql/data/
 
   customerdb:
     container_name: customerdb
@@ -33,7 +33,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - customerdb_data:/var/lib/postgresql/data/
 
   rabbitmq:
     container_name: rabbitmq
