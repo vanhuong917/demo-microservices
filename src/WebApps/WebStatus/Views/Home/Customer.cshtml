@@ -1,0 +1,107 @@
+@{
+    ViewData["Title"] = "Customer API Interface";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        .json-key {
+            color: rgb(141, 15, 15);
+            font-weight: bold;
+        }
+        .json-value {
+            color: rgb(65, 65, 180);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Customer API</h1>
+
+        <h2>Create Customer</h2>
+        <form id="createCustomerForm" class="mb-4">
+            <div class="row">
+                <div class="mb-3 col-md-3">
+                    <label for="customerName" class="form-label">Customer Name:</label>
+                    <input type="text" id="customerName" name="customerName" class="form-control" required>
+                </div>
+                <div class="mb-3 col-md-auto align-self-end">
+                    <button type="submit" class="btn btn-primary">Create Customer</button>
+                </div>
+            </div>
+        </form>
+        <p id="createCustomerResult"></p>
+
+        <h2>Get Customer By ID</h2>
+        <form id="getCustomerByIdForm" class="mb-4">
+            <div class="row">
+                <div class="mb-3 col-md-3">
+                    <label for="getCustomerId" class="form-label">Customer ID:</label>
+                    <input type="text" id="getCustomerId" name="customerId" class="form-control" required>
+                </div>
+                <div class="mb-3 col-md-auto align-self-end">
+                    <button type="submit" class="btn btn-primary">Get Customer</button>
+                </div>
+            </div>
+        </form>
+        <p id="getCustomerByIdResult"></p>
+    </div>
+
+    <script>
+        const apiUrl = 'http://localhost:8010';
+
+        function formatJson(json) {
+            return JSON.stringify(json, null, 2)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|\d+)/g, function (match) {
+                    let cls = 'json-value';
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'json-key';
+                        }
+                    }
+                    return '<span class="' + cls + '">' + match + '</span>';
+                });
+        }
+
+        document.getElementById('createCustomerForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const customerName = document.getElementById('customerName').value;
+            const response = await fetch(`${apiUrl}/customers`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: customerName })
+            });
+            if (response.ok) {
+                const result = await response.json().catch(() => null);
+                if (result) {
+                    document.getElementById('createCustomerResult').innerHTML = `<pre>${formatJson(result)}</pre>`;
+                } else {
+                    document.getElementById('createCustomerResult').innerHTML = '<span class="text-success">&#10003;</span>';
+                }
+            }
+        });
+
+        document.getElementById('getCustomerByIdForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const customerId = document.getElementById('getCustomerId').value;
+            const response = await fetch(`${apiUrl}/customers/${customerId}`);
+            if (response.ok) {
+                const result = await response.json().catch(() => null);
+                if (result) {
+                    document.getElementById('getCustomerByIdResult').innerHTML = `<pre>${formatJson(result)}</pre>`;
+                } else {
+                    document.getElementById('getCustomerByIdResult').innerHTML = '<span class="text-success">&#10003;</span>';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
