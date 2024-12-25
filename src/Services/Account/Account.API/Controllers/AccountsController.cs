@@ -99,3 +99,6 @@ namespace Account.API.Controllers
         }
     }
 }
+
+// 2. Add a new folder named "GrpcServices" in the Account.API project.
+// 3. Add a new class named "CustomerGrpcService.cs" in the "GrpcServices" folder with the following code:
